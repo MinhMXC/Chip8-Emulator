@@ -41,14 +41,14 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "chip8_emulator::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-chip8_emulator-Debug-561f274efb873edf3d8a.json",
+					"jsonFile" : "target-chip8_emulator-Debug-af82c0390a40f1efd513.json",
 					"name" : "chip8_emulator",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "tests::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-tests-Debug-21a98b5d9353c66df4e5.json",
+					"jsonFile" : "target-tests-Debug-4af69e66c139805f85d8.json",
 					"name" : "tests",
 					"projectIndex" : 0
 				}

@@ -3,13 +3,13 @@
 
 // Program Constants
 // Grid Size == 1
-constexpr int PIXEL_SIZE{30};
+constexpr int PIXEL_SIZE{40};
 constexpr int WIDTH{64};
 constexpr int HEIGHT{32};
 constexpr int SCREEN_WIDTH{PIXEL_SIZE * WIDTH + (WIDTH - 1)};
 constexpr int SCREEN_HEIGHT{PIXEL_SIZE * HEIGHT + (HEIGHT - 1)};
 constexpr int RAM_SIZE{4096};
-constexpr int CPU_SPEED{700};
+constexpr int INSTRUCTION_PER_SECOND{700};
 
 constexpr uint32_t GRID_COLOR{0xFF101010};
 

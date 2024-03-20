@@ -8,6 +8,7 @@ public:
     virtual bool flipPixel(int x, int y) { return false; }
     virtual void updateWindowSurface() {}
     virtual void clearScreen() {}
+    virtual void run() {}
 };
 
 #endif

@@ -1,5 +1,5 @@
 #include <cstdio>
-#include "InputHandler.h"
+#include "input_handler.h"
 
 InputHandler::InputHandler(): keys(16) {}
 

@@ -63,8 +63,8 @@ build CMakeFiles/chip8_emulator.dir/src/chip8.cpp.obj: CXX_COMPILER__chip8_emula
   OBJECT_DIR = CMakeFiles\chip8_emulator.dir
   OBJECT_FILE_DIR = CMakeFiles\chip8_emulator.dir\src
 
-build CMakeFiles/chip8_emulator.dir/src/InputHandler.cpp.obj: CXX_COMPILER__chip8_emulator_unscanned_Debug C$:/Users/MinhNguyen/CLionProjects/chip8-emulator/src/InputHandler.cpp || cmake_object_order_depends_target_chip8_emulator
-  DEP_FILE = CMakeFiles\chip8_emulator.dir\src\InputHandler.cpp.obj.d
+build CMakeFiles/chip8_emulator.dir/src/input_handler.cpp.obj: CXX_COMPILER__chip8_emulator_unscanned_Debug C$:/Users/MinhNguyen/CLionProjects/chip8-emulator/src/input_handler.cpp || cmake_object_order_depends_target_chip8_emulator
+  DEP_FILE = CMakeFiles\chip8_emulator.dir\src\input_handler.cpp.obj.d
   FLAGS = -g -fdiagnostics-color=always
   INCLUDES = -IC:/Users/MinhNguyen/CLionProjects/chip8-emulator/SDL/include/SDL2 -isystem "C:/Program Files (x86)/Catch2/include"
   OBJECT_DIR = CMakeFiles\chip8_emulator.dir
@@ -78,7 +78,7 @@ build CMakeFiles/chip8_emulator.dir/src/InputHandler.cpp.obj: CXX_COMPILER__chip
 #############################################
 # Link the executable chip8_emulator.exe
 
-build chip8_emulator.exe: CXX_EXECUTABLE_LINKER__chip8_emulator_Debug CMakeFiles/chip8_emulator.dir/src/main.cpp.obj CMakeFiles/chip8_emulator.dir/src/chip8.cpp.obj CMakeFiles/chip8_emulator.dir/src/InputHandler.cpp.obj | C$:/Users/MinhNguyen/CLionProjects/chip8-emulator/SDL/lib/libSDL2main.a C$:/Users/MinhNguyen/CLionProjects/chip8-emulator/SDL/lib/libSDL2.dll.a C$:/Program$ Files$ (x86)/Catch2/lib/libCatch2Main.a C$:/Program$ Files$ (x86)/Catch2/lib/libCatch2.a
+build chip8_emulator.exe: CXX_EXECUTABLE_LINKER__chip8_emulator_Debug CMakeFiles/chip8_emulator.dir/src/main.cpp.obj CMakeFiles/chip8_emulator.dir/src/chip8.cpp.obj CMakeFiles/chip8_emulator.dir/src/input_handler.cpp.obj | C$:/Users/MinhNguyen/CLionProjects/chip8-emulator/SDL/lib/libSDL2main.a C$:/Users/MinhNguyen/CLionProjects/chip8-emulator/SDL/lib/libSDL2.dll.a C$:/Program$ Files$ (x86)/Catch2/lib/libCatch2Main.a C$:/Program$ Files$ (x86)/Catch2/lib/libCatch2.a
   FLAGS = -g
   LINK_LIBRARIES = -lmingw32  -mwindows  C:/Users/MinhNguyen/CLionProjects/chip8-emulator/SDL/lib/libSDL2main.a  C:/Users/MinhNguyen/CLionProjects/chip8-emulator/SDL/lib/libSDL2.dll.a  "C:/Program Files (x86)/Catch2/lib/libCatch2Main.a"  "C:/Program Files (x86)/Catch2/lib/libCatch2.a"  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\chip8_emulator.dir
@@ -111,8 +111,8 @@ build CMakeFiles/tests.dir/src/chip8.cpp.obj: CXX_COMPILER__tests_unscanned_Debu
   OBJECT_DIR = CMakeFiles\tests.dir
   OBJECT_FILE_DIR = CMakeFiles\tests.dir\src
 
-build CMakeFiles/tests.dir/src/InputHandler.cpp.obj: CXX_COMPILER__tests_unscanned_Debug C$:/Users/MinhNguyen/CLionProjects/chip8-emulator/src/InputHandler.cpp || cmake_object_order_depends_target_tests
-  DEP_FILE = CMakeFiles\tests.dir\src\InputHandler.cpp.obj.d
+build CMakeFiles/tests.dir/src/input_handler.cpp.obj: CXX_COMPILER__tests_unscanned_Debug C$:/Users/MinhNguyen/CLionProjects/chip8-emulator/src/input_handler.cpp || cmake_object_order_depends_target_tests
+  DEP_FILE = CMakeFiles\tests.dir\src\input_handler.cpp.obj.d
   FLAGS = -g -fdiagnostics-color=always
   INCLUDES = -IC:/Users/MinhNguyen/CLionProjects/chip8-emulator/SDL/include/SDL2 -isystem "C:/Program Files (x86)/Catch2/include"
   OBJECT_DIR = CMakeFiles\tests.dir
@@ -126,7 +126,7 @@ build CMakeFiles/tests.dir/src/InputHandler.cpp.obj: CXX_COMPILER__tests_unscann
 #############################################
 # Link the executable tests.exe
 
-build tests.exe: CXX_EXECUTABLE_LINKER__tests_Debug CMakeFiles/tests.dir/tests/test.cpp.obj CMakeFiles/tests.dir/src/chip8.cpp.obj CMakeFiles/tests.dir/src/InputHandler.cpp.obj | C$:/Program$ Files$ (x86)/Catch2/lib/libCatch2Main.a C$:/Program$ Files$ (x86)/Catch2/lib/libCatch2.a
+build tests.exe: CXX_EXECUTABLE_LINKER__tests_Debug CMakeFiles/tests.dir/tests/test.cpp.obj CMakeFiles/tests.dir/src/chip8.cpp.obj CMakeFiles/tests.dir/src/input_handler.cpp.obj | C$:/Program$ Files$ (x86)/Catch2/lib/libCatch2Main.a C$:/Program$ Files$ (x86)/Catch2/lib/libCatch2.a
   FLAGS = -g
   LINK_LIBRARIES = "C:/Program Files (x86)/Catch2/lib/libCatch2Main.a"  "C:/Program Files (x86)/Catch2/lib/libCatch2.a"  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\tests.dir

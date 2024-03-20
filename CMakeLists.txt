@@ -18,9 +18,10 @@ add_executable(chip8_emulator src/main.cpp
         src/constants.h
         src/display.h
         src/SDLDisplay.h
-        src/InputHandler.h
-        src/InputHandler.cpp
+        src/input_handler.h
+        src/input_handler.cpp
         src/timer.h
+        src/sound_player.h
 )
 
 add_executable(tests
@@ -29,8 +30,8 @@ add_executable(tests
         src/chip8.cpp
         src/constants.h
         src/display.h
-        src/InputHandler.h
-        src/InputHandler.cpp
+        src/input_handler.h
+        src/input_handler.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY} Catch2::Catch2WithMain)

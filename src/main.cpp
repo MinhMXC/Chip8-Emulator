@@ -5,13 +5,14 @@
 #include "constants.h"
 #include "chip8.h"
 #include "SDLDisplay.h"
+#include "sound_player.h"
 
 
 int main(int argv, char* args[]) {
     // So that any line printed is displayed immediately
     setbuf(stdout, nullptr);
 
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS) < 0) {
         printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
         return -1;
     }
@@ -31,11 +32,13 @@ int main(int argv, char* args[]) {
     SDLDisplay display{SDLDisplay(window, surface)};
     InputHandler inputHandler{};
     Timer timer{};
+    SoundPlayer soundPlayer{timer, 44100 / 440.00f };
     Chip8 emulator{display, inputHandler, timer, false};
-    std::string file{"../test_roms/Airplane.ch8"};
+    std::string file{"../test_roms/Space Invaders [David Winter].ch8"};
 
     std::thread computerThread(&Chip8::run, &emulator, std::ref(file), std::ref(quit));
     std::thread timerThread(&Timer::run, &timer, std::ref(quit));
+    //  std::thread soundThread(&SoundPlayer::run, &soundPlayer, std::ref(quit));
 
     while (!quit) {
         while (SDL_PollEvent(&e) != 0) {
@@ -45,6 +48,7 @@ int main(int argv, char* args[]) {
                 // Terminating Threads
                 computerThread.join();
                 timerThread.join();
+                // soundThread.join();
 
                 // Destroy SDL Stuff
                 SDL_DestroyWindow(window);

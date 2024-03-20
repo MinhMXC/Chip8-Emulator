@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <iostream>
 #include <thread>
+#include <condition_variable>
 #include <fstream>
 #include <chrono>
 #include "chip8.h"
@@ -18,11 +19,12 @@ void Chip8::run(std::string& filename, bool& stopSignal) {
         return;
     }
 
+    const int microsecondPerInstruction{ 1000000 / INSTRUCTION_PER_SECOND };
     auto start{ std::chrono::high_resolution_clock::now() };
 
     while (!stopSignal) {
         uint16_t ins = (memory[program_counter] << 8) + memory[program_counter + 1];
-        DEBUG_MSG("Instruction: " << std::hex << ins << "   ");
+        // std::cout << "Instruction: " << std::hex << ins << "   ";
         program_counter += 2;
 
         if (!decode(ins)) {
@@ -32,7 +34,7 @@ void Chip8::run(std::string& filename, bool& stopSignal) {
 
         while (true) {
             auto now{ std::chrono::high_resolution_clock::now() };
-            if (std::chrono::duration_cast<std::chrono::microseconds>(now - start).count() > 1428) {
+            if (std::chrono::duration_cast<std::chrono::microseconds>(now - start).count() > microsecondPerInstruction) {
                 start = now;
                 break;
             }
@@ -107,7 +109,7 @@ bool Chip8::decode(uint16_t ins) {
             break;
         case 0x1:
             program_counter = ins % 0x1000;
-            DEBUG_MSG(std::cout << "Jump to " << std::hex << program_counter);
+            DEBUG_MSG("Jump to " << std::hex << program_counter);
             break;
         case 0x2:
             stack.push(program_counter);
@@ -115,29 +117,29 @@ bool Chip8::decode(uint16_t ins) {
             DEBUG_MSG("Begin Function. Program Counter: " << std::hex << program_counter);
             break;
         case 0x3:
-            DEBUG_MSG("CHECK if Register[" << ((ins % 0x3000) >> 8) << "]: " << registers[(ins % 0x3000) >> 8] << " == " << ins % 0x100);
+            DEBUG_MSG("CHECK if Register[" << ((ins % 0x3000) >> 8) << "]: " << +registers[(ins % 0x3000) >> 8] << " == " << ins % 0x100);
             if (registers[(ins % 0x3000) >> 8] == ins % 0x100) {
                 program_counter += 2;
             }
             break;
         case 0x4:
-            DEBUG_MSG("CHECK if Register[" << ((ins % 0x4000) >> 8) << "]: " << registers[(ins % 0x4000) >> 8] << " != " << ins % 0x100);
+            DEBUG_MSG("CHECK if Register[" << ((ins % 0x4000) >> 8) << "]: " << +registers[(ins % 0x4000) >> 8] << " != " << ins % 0x100);
             if (registers[(ins % 0x4000) >> 8] != ins % 0x100) {
                 program_counter += 2;
             }
             break;
         case 0x5:
-            DEBUG_MSG("Check if Register[" << ((ins % 0x5000) >> 8) << "]: " << registers[(ins % 0x5000) >> 8] << "== Register[" << ((ins % 0x0100) >> 4) << "]: " << registers[(ins % 0x0100) >> 4]);
+            DEBUG_MSG("Check if Register[" << ((ins % 0x5000) >> 8) << "]: " << +registers[(ins % 0x5000) >> 8] << "== Register[" << ((ins % 0x0100) >> 4) << "]: " << +registers[(ins % 0x0100) >> 4]);
             if (registers[(ins % 0x5000) >> 8] == registers[(ins % 0x0100) >> 4]) {
                 program_counter += 2;
             }
             break;
         case 0x6:
-            DEBUG_MSG(std::cout << "Set Register[" << ((ins % 0x6000) >> 8) << "] to " << std::hex << ins % 0x100);
+            DEBUG_MSG("Set Register[" << ((ins % 0x6000) >> 8) << "] to " << std::hex << ins % 0x100);
             registers[(ins % 0x6000) >> 8] = ins % 0x100;
             break;
         case 0x7:
-            DEBUG_MSG(std::cout << "Add to Register[" << ((ins % 0x7000) >> 8) << "] value " << std::hex << ins % 0x100);
+            DEBUG_MSG("Add to Register[" << ((ins % 0x7000) >> 8) << "] value " << std::hex << ins % 0x100);
             registers[(ins % 0x7000) >> 8] += ins % 0x100;
             break;
         case 0x8: {
@@ -146,47 +148,47 @@ bool Chip8::decode(uint16_t ins) {
 
             switch (ins % 0x10) {
                 case 0:
-                    DEBUG_MSG("Set Register[" << x << "]: " << registers[x] << " to Register[" << y << "]: " << registers[y]);
+                    DEBUG_MSG("Set Register[" << x << "]: " << +registers[x] << " to Register[" << y << "]: " << +registers[y]);
                     registers[x] = registers[y];
                     break;
                 case 1:
-                    DEBUG_MSG("OR Register[" << x << "]: " << registers[x] << " with Register[" << y << "]: " << registers[y]);
+                    DEBUG_MSG("OR Register[" << x << "]: " << +registers[x] << " with Register[" << y << "]: " << +registers[y]);
                     registers[x] |= registers[y];
                     registers[15] = 0;
                     break;
                 case 2:
-                    DEBUG_MSG("AND Register[" << x << "]: " << registers[x] << " with Register[" << y << "]: " << registers[y]);
+                    DEBUG_MSG("AND Register[" << x << "]: " << +registers[x] << " with Register[" << y << "]: " << +registers[y]);
                     registers[x] &= registers[y];
                     registers[15] = 0;
                     break;
                 case 3:
-                    DEBUG_MSG("XOR Register[" << x << "]: " << registers[x] << " with Register[" << y << "]: " << registers[y]);
+                    DEBUG_MSG("XOR Register[" << x << "]: " << +registers[x] << " with Register[" << y << "]: " << +registers[y]);
                     registers[x] ^= registers[y];
                     registers[15] = 0;
                     break;
                 case 4: {
-                    DEBUG_MSG("ADD Register[" << x << "]: " << registers[x] << " with Register[" << y << "]: " << registers[y]);
+                    DEBUG_MSG("ADD Register[" << x << "]: " << +registers[x] << " with Register[" << y << "]: " << +registers[y]);
                     uint8_t flag = (registers[x] + registers[y]) > 255 ? 1 : 0;
                     registers[x] += registers[y];
                     registers[15] = flag;
                     break;
                 }
                 case 5: {
-                    DEBUG_MSG("SUBTRACT Register[" << x << "]: " << registers[x] << " with Register[" << y << "]: " << registers[y]);
+                    DEBUG_MSG("SUBTRACT Register[" << x << "]: " << +registers[x] << " with Register[" << y << "]: " << +registers[y]);
                     uint8_t flag = registers[x] >= registers[y] ? 1 : 0;
                     registers[x] -= registers[y];
                     registers[15] = flag;
                     break;
                 }
                 case 7: {
-                    DEBUG_MSG("SUBTRACT REVERSE Register[" << x << "]: " << registers[x] << " with Register[" << y << "]: " << registers[y]);
+                    DEBUG_MSG("SUBTRACT REVERSE Register[" << x << "]: " << +registers[x] << " with Register[" << y << "]: " << +registers[y]);
                     uint8_t flag = registers[y] >= registers[x] ? 1 : 0;
                     registers[x] = registers[y] - registers[x];
                     registers[15] = flag;
                     break;
                 }
                 case 6: {
-                    DEBUG_MSG("SHIFT RIGHT Register[" << x << "]: " << registers[x] << " with Register[" << y << "]: " << registers[y]);
+                    DEBUG_MSG("SHIFT RIGHT Register[" << x << "]: " << +registers[x] << " with Register[" << y << "]: " << +registers[y]);
                     if (isOlder) {
                         registers[x] = registers[y];
                     }
@@ -197,7 +199,7 @@ bool Chip8::decode(uint16_t ins) {
                     break;
                 }
                 case 0xE: {
-                    DEBUG_MSG("SHIFT LEFT Register[" << x << "]: " << registers[x] << " with Register[" << y << "]: " << registers[y]);
+                    DEBUG_MSG("SHIFT LEFT Register[" << x << "]: " << +registers[x] << " with Register[" << y << "]: " << +registers[y]);
                     if (isOlder) {
                         registers[x] = registers[y];
                     }
@@ -214,7 +216,7 @@ bool Chip8::decode(uint16_t ins) {
             break;
         }
         case 0x9:
-            DEBUG_MSG("Check if Register[" << ((ins % 0x9000) >> 8) << "]: " << registers[(ins % 0x9000) >> 8] << "!= Register[" << ((ins % 0x0100) >> 4) << "]: " << registers[(ins % 0x0100) >> 4]);
+            DEBUG_MSG("Check if Register[" << ((ins % 0x9000) >> 8) << "]: " << +registers[(ins % 0x9000) >> 8] << "!= Register[" << ((ins % 0x0100) >> 4) << "]: " << +registers[(ins % 0x0100) >> 4]);
             if (registers[(ins % 0x9000) >> 8] != registers[(ins % 0x0100) >> 4]) {
                 program_counter += 2;
             }
@@ -225,20 +227,30 @@ bool Chip8::decode(uint16_t ins) {
             break;
         case 0xB:
             if (isOlder) {
-                DEBUG_MSG("Jump with offset " << std::hex << (ins % 0xB000) + registers[0]);
+                DEBUG_MSG("Jump with offset " << std::hex << (ins % 0xB000) + +registers[0]);
                 program_counter = (ins % 0xB000) + registers[0];
             } else {
-                DEBUG_MSG("Jump with offset " << std::hex << (ins % 0xB000) + registers[(ins % 0xB000) >> 8]);
+                DEBUG_MSG("Jump with offset " << std::hex << (ins % 0xB000) + +registers[(ins % 0xB000) >> 8]);
                 program_counter = (ins % 0xB000) + registers[(ins % 0xB000) >> 8];
             }
             break;
         case 0xC:
-            DEBUG_MSG("Random Register[" << ((ins % 0xC000) >> 8) << "]: " << registers[(ins % 0xC000) >> 8]);
+            DEBUG_MSG("Random Register[" << ((ins % 0xC000) >> 8) << "]: " << +registers[(ins % 0xC000) >> 8]);
             registers[(ins % 0xC000) >> 8] = dist(engine) & (ins % 0x100);
             break;
         case 0xD: {
             uint8_t origin_y = registers[(ins % 0x100) >> 4];
             uint8_t origin_x = registers[(ins % 0xD000) >> 8];
+
+            // Pause execution until next display draw is ready, effectively limiting this instruction to 60Hz
+            while (!timer.getNextDisplayReady()) {
+                int i{};
+            }
+
+            //std::condition_variable::wait_until(timer.getNextDisplayReady());
+
+            // If no pixel are flipped, this value will remain to be 0
+            registers[15] = 0;
 
             for (uint8_t line{}; line < (uint8_t) ins % 0x10; line++) {
                 // Modulo to wrap position
@@ -248,12 +260,14 @@ bool Chip8::decode(uint16_t ins) {
                 std::vector<bool> v(8);
                 decodeSpriteData(index_register + line, v);
 
-                DEBUG_MSG("Display At X: " << x << " , Y: " << y << " ");
+                DEBUG_MSG("Display At X: " << +x << " , Y: " << +y << " " << spriteToString(v));
 
                 int i{};
                 while (i < 8 && x < WIDTH) {
                     if (v[i]) {
-                        registers[15] = display.flipPixel(x, y) ? 1 : 0;
+                        if (display.flipPixel(x, y)) {
+                            registers[15] = 1;
+                        }
                     }
 
                     x++;
@@ -266,6 +280,10 @@ bool Chip8::decode(uint16_t ins) {
             }
 
             display.updateWindowSurface();
+
+            // Set display draw flag to false after execution
+            // timer.setNextDisplayReady(false);
+
             break;
         }
         case 0xE:
@@ -285,20 +303,20 @@ bool Chip8::decode(uint16_t ins) {
             uint8_t x = (ins % 0xF000) >> 8;
             switch ((ins % 0x100)) {
                 case 0x07:
-                    DEBUG_MSG("Set Register[" << x << "] " << registers[x] << " to Delay Timer: " << delay_timer);
+                    DEBUG_MSG("Set Register[" << x << "] " << +registers[x] << " to Delay Timer: " << +timer.getDelayTimer());
                     registers[x] = timer.getDelayTimer();
                     break;
                 case 0x15:
-                    DEBUG_MSG("Set Delay Timer: " << delay_timer << " to Register[" << x << "]: " << registers[x]);
+                    DEBUG_MSG("Set Delay Timer: " << +timer.getDelayTimer() << " to Register[" << x << "]: " << +registers[x]);
                     timer.setDelayTimer(registers[x]);
                     break;
                 case 0x18:
-                    DEBUG_MSG("Set Sound Timer: " << sound_timer << " to Register[" << x << "]: " << registers[x]);
+                    DEBUG_MSG("Set Sound Timer: " << +timer.getSoundTimer() << " to Register[" << x << "]: " << +registers[x]);
                     timer.setSoundTimer(registers[x]);
                     break;
                 case 0x1E:
                     // Behaviour with carry bit when overflowed
-                    DEBUG_MSG("Increment Index Register by " << std::hex << registers[x]);
+                    DEBUG_MSG("Increment Index Register by " << std::hex << +registers[x]);
                     index_register += registers[x];
                     if (index_register >= 4096) {
                         registers[15] = 1;
@@ -327,13 +345,13 @@ bool Chip8::decode(uint16_t ins) {
                     index_register = (registers[x] % 0x10) * 5 + 0x50;
                     break;
                 case 0x33:
-                    DEBUG_MSG("Decode To Decimal: " << registers[x]);
+                    DEBUG_MSG("Decode To Decimal: " << +registers[x]);
                     memory[index_register] = registers[x] / 100;
                     memory[index_register + 1] = (registers[x] % 100) / 10;
                     memory[index_register + 2] = registers[x] % 10;
                     break;
                 case 0x55:
-                    DEBUG_MSG("Load Registers from 0 to " << x);
+                    DEBUG_MSG("Load Registers from 0 to " << +x);
                     if (isOlder) {
                         for (uint8_t i{}; i <= x; i++) {
                             memory[index_register] = registers[i];
@@ -346,7 +364,7 @@ bool Chip8::decode(uint16_t ins) {
                     }
                     break;
                 case 0x65:
-                    DEBUG_MSG("Store Registers from 0 to " << x);
+                    DEBUG_MSG("Store Registers from 0 to " << +x);
                     if (isOlder) {
                         for (uint8_t i{}; i <= x; i++) {
                             registers[i] = memory[index_register];
@@ -365,10 +383,9 @@ bool Chip8::decode(uint16_t ins) {
         }
     DEFAULT:
         default:
-            DEBUG_MSG("Instruction set decode error\n");
+            DEBUG_MSG("Instruction set decode error");
             return false;
     }
-    DEBUG_MSG('\n');
     fflush(stdout);
     return true;
 }
@@ -383,12 +400,11 @@ void Chip8::decodeSpriteData(uint16_t position, std::vector<bool>& v) {
     }
 }
 
-void Chip8::incrementIndexRegister(int i) {
-    index_register += i;
-    if (index_register >= 4096) {
-        index_register -= 4096;
-        registers[15] = 1;
-    } else {
-        registers[15] = 0;
+std::string Chip8::spriteToString(std::vector<bool>& v) {
+    std::string s{ "[" };
+    for (bool b : v) {
+        b ? s.append(" 1") : s.append(" 0");
     }
+    s.append("]");
+    return s;
 }

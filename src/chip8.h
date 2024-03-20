@@ -8,7 +8,7 @@
 #include <string>
 #include "display.h"
 #include <random>
-#include "InputHandler.h"
+#include "input_handler.h"
 #include "timer.h"
 
 class Chip8 {
@@ -45,7 +45,7 @@ protected:
 
     // Helper
     void decodeSpriteData(uint16_t position, std::vector<bool>& v);
-    void incrementIndexRegister(int i);
+    static std::string spriteToString(std::vector<bool>& v);
 
 public:
     Chip8(Display& display, InputHandler& inputHandler, Timer& timer, bool isOlder);
